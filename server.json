@@ -1,0 +1,26 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "ai.sparkquote/nec-calculators",
+  "title": "SparkQuote NEC calculators",
+  "description": "NEC 2023 electrical calculators: wire size, ampacity, voltage drop, conduit fill, box fill, load.",
+  "version": "1.0.1",
+  "websiteUrl": "https://sparkquote.ai/tools/mcp-server",
+  "icons": [
+    {
+      "src": "https://sparkquote.ai/logo.png",
+      "mimeType": "image/png",
+      "sizes": ["512x512"]
+    },
+    {
+      "src": "https://sparkquote.ai/icon.svg",
+      "mimeType": "image/svg+xml",
+      "sizes": ["any"]
+    }
+  ],
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://sparkquote.ai/mcp"
+    }
+  ]
+}
