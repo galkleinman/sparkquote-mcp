@@ -1,0 +1,1335 @@
+{
+  "author": "SparkQuote",
+  "authorUrl": "https://sparkquote.ai",
+  "cloudEndpoint": "https://sparkquote.ai/mcp",
+  "description": "Free NEC 2023 electrical calculators for AI assistants: wire size, Table 310.16 ampacity, voltage drop, conduit fill, box fill, dwelling load calculation, watts to amps, Ohm's law, panel schedules and bid pricing. Remote server, no account or API key; every result cites the NEC table or section it used.",
+  "homepage": "https://sparkquote.ai/tools/mcp-server",
+  "identifier": "sparkquote-nec-calculators",
+  "name": "SparkQuote NEC Calculators",
+  "tools": [
+    {
+      "name": "wire_size",
+      "title": "Wire size calculator",
+      "description": "Minimum conductor size for a circuit: NEC Table 310.16 ampacity at the termination temperature rating, the 240.4(D) small-conductor limits, voltage drop over the run, and the Table 250.122 equipment grounding conductor, increased in proportion under 250.122(B) when voltage drop upsizes the conductors.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "material": {
+            "type": "string",
+            "enum": [
+              "cu",
+              "al"
+            ],
+            "default": "cu",
+            "description": "Conductor. \"cu\" = Copper; \"al\" = Aluminum."
+          },
+          "temp": {
+            "type": "string",
+            "enum": [
+              "60",
+              "75",
+              "90"
+            ],
+            "default": "75",
+            "description": "Termination rating. \"60\" = 60\u00b0C (NM-B, UF); \"75\" = 75\u00b0C (THHN in conduit); \"90\" = 90\u00b0C."
+          },
+          "amps": {
+            "type": "number",
+            "minimum": 1,
+            "default": 60,
+            "description": "Breaker / load (A)."
+          },
+          "volts": {
+            "type": "string",
+            "enum": [
+              "120",
+              "208",
+              "240",
+              "277",
+              "480"
+            ],
+            "default": "240",
+            "description": "Voltage. \"120\" = 120 V; \"208\" = 208 V; \"240\" = 240 V; \"277\" = 277 V; \"480\" = 480 V."
+          },
+          "phase": {
+            "type": "string",
+            "enum": [
+              "1",
+              "3"
+            ],
+            "default": "1",
+            "description": "Phase. \"1\" = Single-phase; \"3\" = Three-phase."
+          },
+          "feet": {
+            "type": "number",
+            "minimum": 1,
+            "default": 150,
+            "description": "One-way distance (ft)."
+          },
+          "limit": {
+            "type": "number",
+            "minimum": 0.5,
+            "default": 3,
+            "description": "Max voltage drop (%)."
+          }
+        },
+        "required": [
+          "material",
+          "temp",
+          "amps",
+          "volts",
+          "phase",
+          "feet",
+          "limit"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "ok": {
+            "type": "boolean"
+          },
+          "summary": {
+            "type": "string"
+          },
+          "rows": {
+            "type": "array",
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "minItems": 2,
+              "maxItems": 2
+            }
+          },
+          "table": {
+            "type": "object",
+            "properties": {
+              "head": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "body": {
+                "type": "array",
+                "items": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "inputs": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "code": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "ok",
+          "summary",
+          "rows",
+          "inputs",
+          "code",
+          "url"
+        ]
+      },
+      "annotations": {
+        "title": "Wire size calculator",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "voltage_drop",
+      "title": "Voltage drop calculator",
+      "description": "Voltage drop for a given conductor size, current and one-way length, single- or three-phase, from NEC Chapter 9 Table 8 circular mils (VD = 2\u00b7K\u00b7I\u00b7L / CM, or \u221a3 for three-phase).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "material": {
+            "type": "string",
+            "enum": [
+              "cu",
+              "al"
+            ],
+            "default": "cu",
+            "description": "Conductor. \"cu\" = Copper; \"al\" = Aluminum."
+          },
+          "awg": {
+            "type": "string",
+            "enum": [
+              "14",
+              "12",
+              "10",
+              "8",
+              "6",
+              "4",
+              "3",
+              "2",
+              "1",
+              "1/0",
+              "2/0",
+              "3/0",
+              "4/0",
+              "250",
+              "300",
+              "350",
+              "400",
+              "500"
+            ],
+            "default": "6",
+            "description": "Size. \"14\" = 14 AWG; \"12\" = 12 AWG; \"10\" = 10 AWG; \"8\" = 8 AWG; \"6\" = 6 AWG; \"4\" = 4 AWG; \"3\" = 3 AWG; \"2\" = 2 AWG; \"1\" = 1 AWG; \"1/0\" = 1/0 AWG; \"2/0\" = 2/0 AWG; \"3/0\" = 3/0 AWG; \"4/0\" = 4/0 AWG; \"250\" = 250 kcmil; \"300\" = 300 kcmil; \"350\" = 350 kcmil; \"400\" = 400 kcmil; \"500\" = 500 kcmil."
+          },
+          "amps": {
+            "type": "number",
+            "minimum": 0.1,
+            "default": 48,
+            "description": "Load current (A)."
+          },
+          "volts": {
+            "type": "string",
+            "enum": [
+              "120",
+              "208",
+              "240",
+              "277",
+              "480"
+            ],
+            "default": "240",
+            "description": "Voltage. \"120\" = 120 V; \"208\" = 208 V; \"240\" = 240 V; \"277\" = 277 V; \"480\" = 480 V."
+          },
+          "phase": {
+            "type": "string",
+            "enum": [
+              "1",
+              "3"
+            ],
+            "default": "1",
+            "description": "Phase. \"1\" = Single-phase; \"3\" = Three-phase."
+          },
+          "feet": {
+            "type": "number",
+            "minimum": 1,
+            "default": 110,
+            "description": "One-way distance (ft)."
+          }
+        },
+        "required": [
+          "material",
+          "awg",
+          "amps",
+          "volts",
+          "phase",
+          "feet"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "ok": {
+            "type": "boolean"
+          },
+          "summary": {
+            "type": "string"
+          },
+          "rows": {
+            "type": "array",
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "minItems": 2,
+              "maxItems": 2
+            }
+          },
+          "table": {
+            "type": "object",
+            "properties": {
+              "head": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "body": {
+                "type": "array",
+                "items": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "inputs": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "code": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "ok",
+          "summary",
+          "rows",
+          "inputs",
+          "code",
+          "url"
+        ]
+      },
+      "annotations": {
+        "title": "Voltage drop calculator",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "watts_to_amps",
+      "title": "Watts to amps calculator",
+      "description": "Current drawn by a load in watts at a voltage and power factor, single- or three-phase, plus the 125% continuous-load value.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "watts": {
+            "type": "number",
+            "minimum": 1,
+            "default": 5000,
+            "description": "Power (W)."
+          },
+          "volts": {
+            "type": "string",
+            "enum": [
+              "120",
+              "208",
+              "240",
+              "277",
+              "480"
+            ],
+            "default": "240",
+            "description": "Voltage. \"120\" = 120 V; \"208\" = 208 V; \"240\" = 240 V; \"277\" = 277 V; \"480\" = 480 V."
+          },
+          "phase": {
+            "type": "string",
+            "enum": [
+              "1",
+              "3"
+            ],
+            "default": "1",
+            "description": "Phase. \"1\" = Single-phase; \"3\" = Three-phase."
+          },
+          "pf": {
+            "type": "number",
+            "minimum": 0.1,
+            "default": 1,
+            "description": "Power factor."
+          }
+        },
+        "required": [
+          "watts",
+          "volts",
+          "phase",
+          "pf"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "ok": {
+            "type": "boolean"
+          },
+          "summary": {
+            "type": "string"
+          },
+          "rows": {
+            "type": "array",
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "minItems": 2,
+              "maxItems": 2
+            }
+          },
+          "table": {
+            "type": "object",
+            "properties": {
+              "head": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "body": {
+                "type": "array",
+                "items": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "inputs": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "code": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "ok",
+          "summary",
+          "rows",
+          "inputs",
+          "code",
+          "url"
+        ]
+      },
+      "annotations": {
+        "title": "Watts to amps calculator",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "conduit_fill",
+      "title": "Conduit fill calculator",
+      "description": "Percent fill and maximum number of THHN/THWN-2 conductors of one size in EMT or PVC Schedule 40, from NEC Chapter 9 Tables 1, 4 and 5.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "EMT",
+              "PVC-40"
+            ],
+            "default": "EMT",
+            "description": "Conduit type. \"EMT\" = EMT; \"PVC-40\" = PVC Schedule 40."
+          },
+          "size": {
+            "type": "string",
+            "enum": [
+              "1",
+              "2",
+              "3",
+              "4",
+              "1/2",
+              "3/4",
+              "1-1/4",
+              "1-1/2",
+              "2-1/2",
+              "3-1/2"
+            ],
+            "default": "3/4",
+            "description": "Trade size. \"1\" = 1\"; \"2\" = 2\"; \"3\" = 3\"; \"4\" = 4\"; \"1/2\" = 1/2\"; \"3/4\" = 3/4\"; \"1-1/4\" = 1-1/4\"; \"1-1/2\" = 1-1/2\"; \"2-1/2\" = 2-1/2\"; \"3-1/2\" = 3-1/2\"."
+          },
+          "awg": {
+            "type": "string",
+            "enum": [
+              "1",
+              "2",
+              "3",
+              "4",
+              "6",
+              "8",
+              "10",
+              "12",
+              "14",
+              "1/0",
+              "2/0",
+              "3/0",
+              "4/0"
+            ],
+            "default": "12",
+            "description": "THHN/THWN-2 size. \"1\" = 1 AWG; \"2\" = 2 AWG; \"3\" = 3 AWG; \"4\" = 4 AWG; \"6\" = 6 AWG; \"8\" = 8 AWG; \"10\" = 10 AWG; \"12\" = 12 AWG; \"14\" = 14 AWG; \"1/0\" = 1/0 AWG; \"2/0\" = 2/0 AWG; \"3/0\" = 3/0 AWG; \"4/0\" = 4/0 AWG."
+          },
+          "count": {
+            "type": "number",
+            "minimum": 1,
+            "default": 10,
+            "description": "Number of conductors."
+          }
+        },
+        "required": [
+          "type",
+          "size",
+          "awg",
+          "count"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "ok": {
+            "type": "boolean"
+          },
+          "summary": {
+            "type": "string"
+          },
+          "rows": {
+            "type": "array",
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "minItems": 2,
+              "maxItems": 2
+            }
+          },
+          "table": {
+            "type": "object",
+            "properties": {
+              "head": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "body": {
+                "type": "array",
+                "items": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "inputs": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "code": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "ok",
+          "summary",
+          "rows",
+          "inputs",
+          "code",
+          "url"
+        ]
+      },
+      "annotations": {
+        "title": "Conduit fill calculator",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "box_fill",
+      "title": "Box fill calculator",
+      "description": "Minimum outlet box volume from NEC 314.16(B): conductor, device (2 each), clamp and grounding allowances times the Table 314.16(B) volume for the largest conductor.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "awg": {
+            "type": "string",
+            "enum": [
+              "6",
+              "8",
+              "10",
+              "12",
+              "14",
+              "16",
+              "18"
+            ],
+            "default": "12",
+            "description": "Largest conductor. \"6\" = 6 AWG; \"8\" = 8 AWG; \"10\" = 10 AWG; \"12\" = 12 AWG; \"14\" = 14 AWG; \"16\" = 16 AWG; \"18\" = 18 AWG."
+          },
+          "conductors": {
+            "type": "number",
+            "minimum": 0,
+            "default": 5,
+            "description": "Insulated conductors (not counting grounds)."
+          },
+          "devices": {
+            "type": "number",
+            "minimum": 0,
+            "default": 1,
+            "description": "Devices (switches, receptacles)."
+          },
+          "clamps": {
+            "type": "string",
+            "enum": [
+              "0",
+              "1"
+            ],
+            "default": "1",
+            "description": "Internal cable clamps. \"0\" = None; \"1\" = One or more."
+          },
+          "grounds": {
+            "type": "string",
+            "enum": [
+              "0",
+              "1"
+            ],
+            "default": "1",
+            "description": "Equipment grounding conductors. \"0\" = None; \"1\" = One or more."
+          }
+        },
+        "required": [
+          "awg",
+          "conductors",
+          "devices",
+          "clamps",
+          "grounds"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "ok": {
+            "type": "boolean"
+          },
+          "summary": {
+            "type": "string"
+          },
+          "rows": {
+            "type": "array",
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "minItems": 2,
+              "maxItems": 2
+            }
+          },
+          "table": {
+            "type": "object",
+            "properties": {
+              "head": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "body": {
+                "type": "array",
+                "items": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "inputs": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "code": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "ok",
+          "summary",
+          "rows",
+          "inputs",
+          "code",
+          "url"
+        ]
+      },
+      "annotations": {
+        "title": "Box fill calculator",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "load_calculator",
+      "title": "Residential load calculator (NEC 220.82)",
+      "description": "Dwelling service load by the NEC 220.82 optional method: 3 VA/ft\u00b2 lighting, small-appliance and laundry circuits, fixed appliances, demand factor, heating or cooling, and the minimum standard service size. Leave an appliance out to count it as 0 VA.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "sqft": {
+            "type": "number",
+            "minimum": 1,
+            "default": 2400,
+            "description": "Living area (ft\u00b2)."
+          },
+          "small": {
+            "type": "number",
+            "minimum": 2,
+            "default": 2,
+            "description": "Small-appliance circuits."
+          },
+          "laundry": {
+            "type": "string",
+            "enum": [
+              "1",
+              "0"
+            ],
+            "default": "1",
+            "description": "Laundry circuit. \"1\" = Yes (1,500 VA); \"0\" = No."
+          },
+          "range": {
+            "type": "number",
+            "minimum": 0,
+            "default": 12000,
+            "description": "Range / cooktop (VA). Optional."
+          },
+          "dryer": {
+            "type": "number",
+            "minimum": 0,
+            "default": 5000,
+            "description": "Dryer (VA). Optional."
+          },
+          "heater": {
+            "type": "number",
+            "minimum": 0,
+            "default": 4500,
+            "description": "Water heater (VA). Optional."
+          },
+          "dishwasher": {
+            "type": "number",
+            "minimum": 0,
+            "default": 1200,
+            "description": "Dishwasher (VA). Optional."
+          },
+          "disposal": {
+            "type": "number",
+            "minimum": 0,
+            "default": 800,
+            "description": "Disposal (VA). Optional."
+          },
+          "ev": {
+            "type": "number",
+            "minimum": 0,
+            "default": 0,
+            "description": "EV charger (VA). Optional."
+          },
+          "other": {
+            "type": "number",
+            "minimum": 0,
+            "default": 0,
+            "description": "Other fixed appliances (VA). Optional."
+          },
+          "hvac": {
+            "type": "number",
+            "minimum": 0,
+            "default": 5000,
+            "description": "Largest of heating or cooling (VA). Optional."
+          }
+        },
+        "required": [
+          "sqft",
+          "small",
+          "laundry"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "ok": {
+            "type": "boolean"
+          },
+          "summary": {
+            "type": "string"
+          },
+          "rows": {
+            "type": "array",
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "minItems": 2,
+              "maxItems": 2
+            }
+          },
+          "table": {
+            "type": "object",
+            "properties": {
+              "head": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "body": {
+                "type": "array",
+                "items": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "inputs": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "code": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "ok",
+          "summary",
+          "rows",
+          "inputs",
+          "code",
+          "url"
+        ]
+      },
+      "annotations": {
+        "title": "Residential load calculator (NEC 220.82)",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "ohms_law",
+      "title": "Ohm's law calculator",
+      "description": "Ohm's law and power: give exactly two of voltage, current, resistance and power; the other two are calculated.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "v": {
+            "type": "number",
+            "minimum": 0,
+            "default": 120,
+            "description": "Voltage (V). Optional."
+          },
+          "i": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Current (A). Optional."
+          },
+          "r": {
+            "type": "number",
+            "minimum": 0,
+            "default": 24,
+            "description": "Resistance (\u03a9). Optional."
+          },
+          "p": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Power (W). Optional."
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "ok": {
+            "type": "boolean"
+          },
+          "summary": {
+            "type": "string"
+          },
+          "rows": {
+            "type": "array",
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "minItems": 2,
+              "maxItems": 2
+            }
+          },
+          "table": {
+            "type": "object",
+            "properties": {
+              "head": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "body": {
+                "type": "array",
+                "items": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "inputs": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "code": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "ok",
+          "summary",
+          "rows",
+          "inputs",
+          "code",
+          "url"
+        ]
+      },
+      "annotations": {
+        "title": "Ohm's law calculator",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "panel_schedule",
+      "title": "Panel schedule generator",
+      "description": "Lays circuits out on a 120/240 V single-phase or 208Y/120 V three-phase panel and totals the load per phase with the imbalance.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "system": {
+            "type": "string",
+            "enum": [
+              "1",
+              "3"
+            ],
+            "default": "1",
+            "description": "Panel. \"1\" = 120/240 V single-phase; \"3\" = 208Y/120 V three-phase."
+          },
+          "spaces": {
+            "type": "string",
+            "enum": [
+              "12",
+              "20",
+              "24",
+              "30",
+              "42"
+            ],
+            "default": "30",
+            "description": "Spaces. \"12\" = 12; \"20\" = 20; \"24\" = 24; \"30\" = 30; \"42\" = 42."
+          },
+          "circuits": {
+            "type": "string",
+            "default": "Kitchen receptacles, 20, 1, 1500\nKitchen receptacles, 20, 1, 1500\nMicrowave, 20, 1, 1500\nDishwasher, 15, 1, 1200\nRange, 50, 2, 12000\nDryer, 30, 2, 5000\nWater heater, 30, 2, 4500\nLighting, 15, 1, 1200",
+            "description": "Circuits: description, breaker A, poles, VA (one per line)"
+          }
+        },
+        "required": [
+          "system",
+          "spaces",
+          "circuits"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "ok": {
+            "type": "boolean"
+          },
+          "summary": {
+            "type": "string"
+          },
+          "rows": {
+            "type": "array",
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "minItems": 2,
+              "maxItems": 2
+            }
+          },
+          "table": {
+            "type": "object",
+            "properties": {
+              "head": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "body": {
+                "type": "array",
+                "items": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "inputs": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "code": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "ok",
+          "summary",
+          "rows",
+          "inputs",
+          "code",
+          "url"
+        ]
+      },
+      "annotations": {
+        "title": "Panel schedule generator",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "bid_calculator",
+      "title": "Electrical bid calculator",
+      "description": "Electrical bid price from materials, markup, labor hours and rate, job costs, overhead and a target net margin (price = break-even / (1 \u2212 margin)).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "materials": {
+            "type": "number",
+            "minimum": 0,
+            "default": 1850,
+            "description": "Material cost ($)."
+          },
+          "markup": {
+            "type": "number",
+            "minimum": 0,
+            "default": 0,
+            "description": "Material markup (%). Optional."
+          },
+          "hours": {
+            "type": "number",
+            "minimum": 0,
+            "default": 40,
+            "description": "Labor hours (h)."
+          },
+          "rate": {
+            "type": "number",
+            "minimum": 0,
+            "default": 55,
+            "description": "Burdened labor cost ($/h)."
+          },
+          "direct": {
+            "type": "number",
+            "minimum": 0,
+            "default": 250,
+            "description": "Permits and other job costs ($). Optional."
+          },
+          "overhead": {
+            "type": "number",
+            "minimum": 0,
+            "default": 20,
+            "description": "Overhead (% of direct cost) (%)."
+          },
+          "margin": {
+            "type": "number",
+            "minimum": 0,
+            "default": 15,
+            "description": "Target net margin (%)."
+          }
+        },
+        "required": [
+          "materials",
+          "hours",
+          "rate",
+          "overhead",
+          "margin"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "ok": {
+            "type": "boolean"
+          },
+          "summary": {
+            "type": "string"
+          },
+          "rows": {
+            "type": "array",
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "minItems": 2,
+              "maxItems": 2
+            }
+          },
+          "table": {
+            "type": "object",
+            "properties": {
+              "head": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "body": {
+                "type": "array",
+                "items": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "inputs": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "code": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "ok",
+          "summary",
+          "rows",
+          "inputs",
+          "code",
+          "url"
+        ]
+      },
+      "annotations": {
+        "title": "Electrical bid calculator",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "nec_ampacity",
+      "title": "NEC Table 310.16 ampacity lookup",
+      "description": "Allowable ampacity of one insulated conductor from NEC Table 310.16 (not more than three current-carrying conductors in a raceway or cable, 30\u00b0C ambient), before any adjustment or correction factors and before the 240.4(D) small-conductor limits.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "material": {
+            "type": "string",
+            "enum": [
+              "cu",
+              "al"
+            ],
+            "description": "\"cu\" = copper; \"al\" = aluminum."
+          },
+          "temp": {
+            "type": "string",
+            "enum": [
+              "60",
+              "75",
+              "90"
+            ],
+            "description": "Temperature column in \u00b0C: 60 (NM-B, UF), 75 (THWN, most terminations), 90 (THHN, for derating)."
+          },
+          "size": {
+            "type": "string",
+            "enum": [
+              "14",
+              "12",
+              "10",
+              "8",
+              "6",
+              "4",
+              "3",
+              "2",
+              "1",
+              "1/0",
+              "2/0",
+              "3/0",
+              "4/0",
+              "250",
+              "300",
+              "350",
+              "400",
+              "500"
+            ],
+            "description": "Conductor size: AWG (\"14\" \u2026 \"4/0\") or kcmil (\"250\" \u2026 \"500\")."
+          }
+        },
+        "required": [
+          "material",
+          "temp",
+          "size"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "ok": {
+            "type": "boolean"
+          },
+          "summary": {
+            "type": "string"
+          },
+          "rows": {
+            "type": "array",
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "minItems": 2,
+              "maxItems": 2
+            }
+          },
+          "table": {
+            "type": "object",
+            "properties": {
+              "head": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "body": {
+                "type": "array",
+                "items": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "inputs": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "code": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "ok",
+          "summary",
+          "rows",
+          "inputs",
+          "code",
+          "url"
+        ]
+      },
+      "annotations": {
+        "title": "NEC Table 310.16 ampacity lookup",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    }
+  ],
+  "version": "1.0.1",
+  "icon": "https://sparkquote.ai/logo.png",
+  "category": "tools",
+  "tags": [
+    "electrical",
+    "nec",
+    "electrician",
+    "calculator",
+    "construction",
+    "engineering"
+  ]
+}
