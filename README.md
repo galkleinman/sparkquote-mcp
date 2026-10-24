@@ -9,7 +9,7 @@ Free NEC 2023 electrical calculators for Claude, ChatGPT, Cursor and any MCP cli
 - **Code edition:** NEC 2023 (NFPA 70)
 - **Price:** free
 
-This is a hosted (remote) server, so there is nothing to install. This repository holds the documentation and the MCP registry metadata (`server.json`). Listed in the [official MCP registry](https://registry.modelcontextprotocol.io/v0.1/servers?search=ai.sparkquote) as `ai.sparkquote/nec-calculators` and on [Smithery](https://smithery.ai/servers/sparkquote/nec-calculators). Full docs: [sparkquote.ai/tools/mcp-server](https://sparkquote.ai/tools/mcp-server).
+This is a hosted (remote) server, so there is nothing to install. This repository holds the documentation, the MCP registry metadata (`server.json`) and the Cursor plugin (`.cursor-plugin/plugin.json` plus `mcp.json`). Listed in the [official MCP registry](https://registry.modelcontextprotocol.io/v0.1/servers?search=ai.sparkquote) as `ai.sparkquote/nec-calculators` and on [Smithery](https://smithery.ai/servers/sparkquote/nec-calculators). Full docs: [sparkquote.ai/tools/mcp-server](https://sparkquote.ai/tools/mcp-server).
 
 ## Add it to your assistant
 
@@ -30,7 +30,9 @@ claude mcp add --transport http sparkquote https://sparkquote.ai/mcp
 url = "https://sparkquote.ai/mcp"
 ```
 
-**Cursor, VS Code and other clients** with a JSON config
+**Cursor.** Install the SparkQuote plugin from the Cursor Marketplace, or add the JSON below to `~/.cursor/mcp.json`.
+
+**VS Code and other clients** with a JSON config
 
 ```json
 { "mcpServers": { "sparkquote": { "url": "https://sparkquote.ai/mcp" } } }
@@ -85,5 +87,7 @@ A tool call sends only the tool name and its arguments. We log the tool name, su
 Report a wrong result or a connection problem to privacy@sparkquote.ai with the tool name and arguments, or open an issue here.
 
 ---
+
+The files in this repository are MIT licensed (see `LICENSE`). The hosted server is operated by SparkQuote.
 
 Built by [SparkQuote](https://sparkquote.ai), AI takeoff and estimating for electrical contractors. The web versions of these calculators are at [sparkquote.ai/tools](https://sparkquote.ai/tools).

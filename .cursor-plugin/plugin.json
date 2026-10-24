@@ -1,0 +1,11 @@
+{
+  "name": "sparkquote-nec-calculators",
+  "description": "Free NEC 2023 electrical calculators: wire size, Table 310.16 ampacity, voltage drop, conduit fill, box fill, dwelling load, watts to amps, Ohm's law, panel schedules and bid pricing. Remote server, no account or API key; every result cites the NEC table or section it used.",
+  "version": "1.0.0",
+  "author": { "name": "SparkQuote", "email": "privacy@sparkquote.ai" },
+  "homepage": "https://sparkquote.ai/tools/mcp-server",
+  "repository": "https://github.com/galkleinman/sparkquote-mcp",
+  "license": "MIT",
+  "keywords": ["nec", "electrical", "electrician", "wire-size", "ampacity", "voltage-drop", "conduit-fill", "calculator", "construction", "estimating"],
+  "logo": "assets/logo.png"
+}
